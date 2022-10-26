@@ -30,3 +30,9 @@ code {
 .post-list span {
 	font-size: 12px;
 }
+
+.pagination-wrapper {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 6em;
+}
