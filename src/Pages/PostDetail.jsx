@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query'
 function PostDetail() {
 	const params = useParams()
 	const { id } = params
-	console.log(id)
 
 	async function fetchPost() {
 		const response = await fetch(
@@ -36,12 +35,12 @@ function PostDetail() {
 		staleTime: 300000,
 	})
 
-	if (isLoading || commentLoading) {
-		return <h1>Loading...</h1>
+	if (isLoading) {
+		return <span>Loading...</span>
 	}
 
-	if (error || commentError) {
-		return <h1>Error: {error.message}</h1>
+	if (error) {
+		return <span>Error: {error.message}</span>
 	}
 
 	const commentCount = Object.keys(comments).length

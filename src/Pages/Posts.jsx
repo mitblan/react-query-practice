@@ -1,32 +1,42 @@
 // TODO - Get current page from url
 
 // Use component state for current page for pagination
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 // Use React Query to cache posts
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import PostItem from '../Component/PostItem'
+import { fetchPosts } from '../api/postsAPI'
 
 function Posts() {
 	const [currentPage, setCurrentPage] = useState(1)
+	const maxPages = 10
 
-	async function fetchPosts() {
-		const response = await fetch(
-			`https://jsonplaceholder.typicode.com/posts?_limit=10&_page=${currentPage}`
-		)
-
-		return response.json()
-	}
+	const queryClient = useQueryClient()
 
 	const {
 		isLoading,
 		error,
 		data: posts,
-	} = useQuery(['posts', currentPage], () => fetchPosts(currentPage), {
-		staleTime: 300000,
-	})
+	} = useQuery(
+		['posts', currentPage],
+		() => fetchPosts(maxPages, currentPage),
+		{
+			staleTime: 60000 * 60 * 24,
+			keepPreviousData: true,
+		}
+	)
+
+	useEffect(() => {
+		if (currentPage < maxPages) {
+			const nextPage = currentPage + 1
+			queryClient.prefetchQuery(['posts', nextPage], () =>
+				fetchPosts(maxPages, nextPage)
+			)
+		}
+	}, [currentPage, queryClient])
 
 	if (isLoading) {
-		return <h1>Loading...</h1>
+		return <span>Loading...</span>
 	}
 
 	if (error) {
@@ -43,9 +53,17 @@ function Posts() {
 				<PostItem key={post.id} post={post} />
 			))}
 			<div className='pagination-wrapper'>
-				<button onClick={() => setCurrentPage(currentPage - 1)}>Prev</button>
+				<button
+					disabled={currentPage <= 1}
+					onClick={() => setCurrentPage(currentPage - 1)}>
+					Prev
+				</button>
 				<span>{currentPage}</span>
-				<button onClick={() => setCurrentPage(currentPage + 1)}>Next</button>
+				<button
+					disabled={currentPage >= maxPages}
+					onClick={() => setCurrentPage(currentPage + 1)}>
+					Next
+				</button>
 			</div>
 		</>
 	)
