@@ -1,42 +1,47 @@
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
+import { fetchPost, fetchPostComments } from '../api/postsAPI'
 
 function PostDetail() {
 	const params = useParams()
 	const { id } = params
 
-	async function fetchPost() {
+	/* 	async function fetchPost() {
 		const response = await fetch(
 			`https://jsonplaceholder.typicode.com/posts/${id}`
 		)
 
 		return response.json()
-	}
+	} */
 
-	async function fetchPostComments() {
+	/* 	async function fetchPostComments() {
 		const response = await fetch(
 			`https://jsonplaceholder.typicode.com/posts/${id}/comments`
 		)
 
 		return response.json()
-	}
+	} */
 
 	const {
 		isLoading,
 		error,
 		data: post,
-	} = useQuery(['post', id], fetchPost, { staleTime: 300000 })
+	} = useQuery(['post', id], () => fetchPost(id), { staleTime: 300000 })
 
 	const {
 		isLoading: commentLoading,
 		error: commentError,
 		data: comments,
-	} = useQuery(['comments', id], fetchPostComments, {
+	} = useQuery(['comments', id], () => fetchPostComments(id), {
 		staleTime: 300000,
 	})
 
 	if (isLoading) {
 		return <span>Loading...</span>
+	}
+
+	if (commentLoading) {
+		return <span></span>
 	}
 
 	if (error) {
