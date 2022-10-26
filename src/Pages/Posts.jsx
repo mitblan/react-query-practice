@@ -4,7 +4,7 @@
 import { useState } from 'react'
 // Use React Query to cache posts
 import { useQuery } from '@tanstack/react-query'
-import PostDetail from '../Component/PostDetail'
+import PostItem from '../Component/PostItem'
 
 async function fetchPosts() {
 	const response = await fetch(
@@ -38,7 +38,7 @@ function Posts() {
 	return (
 		<>
 			{posts.map((post) => (
-				<PostDetail key={post.id} post={post} />
+				<PostItem key={post.id} post={post} />
 			))}
 		</>
 	)
